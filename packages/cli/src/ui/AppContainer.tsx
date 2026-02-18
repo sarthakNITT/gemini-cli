@@ -229,6 +229,9 @@ export const AppContainer = (props: AppContainerProps) => {
   useMemoryMonitor(historyManager);
   const isAlternateBuffer = useAlternateBuffer();
   const [corgiMode, setCorgiMode] = useState(false);
+  const [isOnboardingForeverMode, setIsOnboardingForeverMode] = useState(
+    () => config.getIsForeverMode() && !config.getIsForeverModeConfigured(),
+  );
   const [forceRerenderKey, setForceRerenderKey] = useState(0);
   const [debugMessage, setDebugMessage] = useState<string>('');
   const [quittingMessages, setQuittingMessages] = useState<
@@ -1097,6 +1100,9 @@ Logging in with Google... Restarting Gemini CLI to continue.
     backgroundShells,
     dismissBackgroundShell,
     retryStatus,
+    sisyphusSecondsRemaining,
+    isConfuciusMode,
+    confuciusModeSecondsRemaining,
   } = useGeminiStream(
     config.getGeminiClient(),
     historyManager.history,
@@ -1411,32 +1417,6 @@ Logging in with Google... Restarting Gemini CLI to continue.
   const geminiClient = config.getGeminiClient();
 
   useEffect(() => {
-    if (activePtyId) {
-      try {
-        ShellExecutionService.resizePty(
-          activePtyId,
-          Math.floor(terminalWidth * SHELL_WIDTH_FRACTION),
-          Math.max(
-            Math.floor(availableTerminalHeight - SHELL_HEIGHT_PADDING),
-            1,
-          ),
-        );
-      } catch (e) {
-        // This can happen in a race condition where the pty exits
-        // right before we try to resize it.
-        if (
-          !(
-            e instanceof Error &&
-            e.message.includes('Cannot resize a pty that has already exited')
-          )
-        ) {
-          throw e;
-        }
-      }
-    }
-  }, [terminalWidth, availableTerminalHeight, activePtyId]);
-
-  useEffect(() => {
     if (
       initialPrompt &&
       isConfigInitialized &&
@@ -1446,7 +1426,9 @@ Logging in with Google... Restarting Gemini CLI to continue.
       !isThemeDialogOpen &&
       !isEditorDialogOpen &&
       !showPrivacyNotice &&
-      geminiClient?.isInitialized?.()
+      !isOnboardingForeverMode &&
+      geminiClient?.isInitialized?.() &&
+      isMcpReady
     ) {
       void handleFinalSubmit(initialPrompt);
       initialPromptSubmitted.current = true;
@@ -1460,7 +1442,9 @@ Logging in with Google... Restarting Gemini CLI to continue.
     isThemeDialogOpen,
     isEditorDialogOpen,
     showPrivacyNotice,
+    isOnboardingForeverMode,
     geminiClient,
+    isMcpReady,
   ]);
 
   const [idePromptAnswered, setIdePromptAnswered] = useState(false);
@@ -2027,8 +2011,9 @@ Logging in with Google... Restarting Gemini CLI to continue.
 
   const dialogsVisible =
     (shouldShowRetentionWarning && retentionCheckComplete) ||
+    isOnboardingForeverMode ||
     shouldShowIdePrompt ||
-    isFolderTrustDialogOpen ||
+    (!isOnboardingForeverMode && isFolderTrustDialogOpen) ||
     isPolicyUpdateDialogOpen ||
     adminSettingsChanged ||
     !!commandConfirmationRequest ||
@@ -2206,6 +2191,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
 
   const uiState: UIState = useMemo(
     () => ({
+      isOnboardingForeverMode,
       history: historyManager.history,
       historyManager,
       isThemeDialogOpen,
@@ -2334,6 +2320,9 @@ Logging in with Google... Restarting Gemini CLI to continue.
           ...pendingGeminiHistoryItems,
         ]),
       hintBuffer: '',
+      sisyphusSecondsRemaining,
+      isConfuciusMode,
+      confuciusModeSecondsRemaining,
     }),
     [
       isThemeDialogOpen,
@@ -2454,6 +2443,10 @@ Logging in with Google... Restarting Gemini CLI to continue.
       adminSettingsChanged,
       newAgents,
       showIsExpandableHint,
+      sisyphusSecondsRemaining,
+      isConfuciusMode,
+      confuciusModeSecondsRemaining,
+      isOnboardingForeverMode,
     ],
   );
 
@@ -2464,6 +2457,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
 
   const uiActions: UIActions = useMemo(
     () => ({
+      setIsOnboardingForeverMode,
       handleThemeSelect,
       closeThemeDialog,
       handleThemeHighlight,
@@ -2570,6 +2564,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
       handleFolderTrustSelect,
       setIsPolicyUpdateDialogOpen,
       setConstrainHeight,
+      setIsOnboardingForeverMode,
       handleEscapePromptChange,
       refreshStatic,
       handleFinalSubmit,

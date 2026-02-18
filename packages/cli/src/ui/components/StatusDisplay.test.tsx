@@ -54,6 +54,9 @@ const createMockUIState = (overrides: UIStateOverrides = {}): UIState =>
     backgroundShellCount: 0,
     buffer: { text: '' },
     history: [{ id: 1, type: 'user', text: 'test' }],
+    sisyphusSecondsRemaining: null,
+    isConfuciusMode: false,
+    confuciusModeSecondsRemaining: null,
     ...overrides,
   }) as UIState;
 
@@ -118,6 +121,18 @@ describe('StatusDisplay', () => {
     unmount();
   });
 
+  it('renders "Reflecting (Confucius Mode)..." status when active', async () => {
+    const uiState = createMockUIState({
+      isConfuciusMode: true,
+    });
+    const { lastFrame, unmount } = await renderStatusDisplay(
+      { hideContextSummary: false },
+      uiState,
+    );
+    expect(lastFrame()).toContain('✦ Reflecting (Confucius Mode)...');
+    unmount();
+  });
+
   it('renders HookStatusDisplay when hooks are active', async () => {
     const uiState = createMockUIState({
       activeHooks: [{ name: 'hook', eventName: 'event' }],
@@ -169,5 +184,16 @@ describe('StatusDisplay', () => {
     );
     expect(lastFrame()).toContain('Shells: 3');
     unmount();
+  });
+
+  it('renders Sisyphus countdown timer when active', () => {
+    const uiState = createMockUIState({
+      sisyphusSecondsRemaining: 65, // 01:05
+    });
+    const { lastFrame } = renderStatusDisplay(
+      { hideContextSummary: false },
+      uiState,
+    );
+    expect(lastFrame()).toContain('✦ Resuming work in 01:05');
   });
 });

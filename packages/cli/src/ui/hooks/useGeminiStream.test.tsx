@@ -239,6 +239,7 @@ describe('useGeminiStream', () => {
     storage: {
       getProjectTempDir: vi.fn(() => '/test/temp'),
       getProjectTempCheckpointsDir: vi.fn(() => '/test/temp/checkpoints'),
+      getConfuciusModeStatePath: vi.fn(() => '/test/temp/confucius_state.json'),
     } as any,
     getToolRegistry: vi.fn(
       () => ({ getToolSchemaList: vi.fn(() => []) }) as any,
@@ -278,6 +279,15 @@ describe('useGeminiStream', () => {
     })),
     getIdeMode: vi.fn(() => false),
     getEnableHooks: vi.fn(() => false),
+    getIsForeverMode: vi.fn(() => false),
+    getIsForeverModeConfigured: vi.fn(() => false),
+    getConfuciusMode: vi.fn(() => ({ intervalHours: 4 })),
+    getSisyphusMode: vi.fn(() => ({
+      enabled: false,
+      idleTimeout: 1,
+      prompt: 'continue workflow',
+      confuciusMode: { intervalHours: 8 },
+    })),
   } as unknown as Config;
 
   beforeEach(() => {

@@ -117,6 +117,7 @@ export interface CompressionProps {
   originalTokenCount: number | null;
   newTokenCount: number | null;
   compressionStatus: CompressionStatus | null;
+  archivePath?: string;
 }
 
 /**
