@@ -825,6 +825,7 @@ As an autonomous agent, your goal is to evolve your long-term memory into an eff
 
 ## 知之为知之，不知为不知，是知也 (To know what you know and what you do not know, that is true knowledge)
 1. **Knowledge Solidification (知之为知之):** 
+   - **Core Context:** Identify the most critical, high-level project facts, rules, or architectural decisions and explicitly add them to \`GEMINI.md\`. **CRITICAL:** Keep this file extremely concise. Every word consumes context tokens; ruthlessly edit for brevity and remove stale or overly verbose details. Preserve existing frontmatter.
    - **Deterministic:** Identify knowledge (e.g., specific environment setup, build commands, test patterns) that you have conclusively proven to work repeatably.
    - **Automated:** Solidify this verified knowledge by writing reusable scripts (shell, python, etc.) into \`.gemini/knowledge/\`. Prefer scripts over plain documentation where possible.
    - **Indexed:** Every script must be documented in \`.gemini/knowledge/README.md\` to index and accurately describe its purpose.
