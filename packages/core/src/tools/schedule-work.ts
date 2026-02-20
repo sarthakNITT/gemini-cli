@@ -75,7 +75,7 @@ export class ScheduleWorkInvocation extends BaseToolInvocation<
 
   async execute(_signal: AbortSignal): Promise<ToolResult> {
     return {
-      llmContent: `Work scheduled. The system will wake you up in ${this.params.inMinutes} minutes. Please end your turn now.`,
+      llmContent: `Work scheduled. The system will wake you up in ${this.params.inMinutes} minutes. DO NOT make any further tool calls. Instead, provide a brief text summary of the work completed so far to end your turn.`,
       returnDisplay: `Scheduled work to resume in ${this.params.inMinutes} minutes.`,
     };
   }
