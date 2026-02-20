@@ -186,7 +186,9 @@ export class PromptProvider {
                 enableCodebaseInvestigator: enabledToolNames.has(
                   CodebaseInvestigatorAgent.name,
                 ),
-                enableWriteTodosTool: enabledToolNames.has(WRITE_TODOS_TOOL_NAME),
+                enableWriteTodosTool: enabledToolNames.has(
+                  WRITE_TODOS_TOOL_NAME,
+                ),
                 enableEnterPlanModeTool: enabledToolNames.has(
                   ENTER_PLAN_MODE_TOOL_NAME,
                 ),
@@ -212,14 +214,11 @@ export class PromptProvider {
             : undefined,
         operationalGuidelines: isForeverMode
           ? undefined
-          : this.withSection(
-              'operationalGuidelines',
-              () => ({
-                interactive: interactiveMode,
-                enableShellEfficiency: config.getEnableShellOutputEfficiency(),
-                interactiveShellEnabled: config.isInteractiveShellEnabled(),
-              }),
-            ),
+          : this.withSection('operationalGuidelines', () => ({
+              interactive: interactiveMode,
+              enableShellEfficiency: config.getEnableShellOutputEfficiency(),
+              interactiveShellEnabled: config.isInteractiveShellEnabled(),
+            })),
         sandbox: this.withSection('sandbox', () => getSandboxMode()),
         interactiveYoloMode: this.withSection(
           'interactiveYoloMode',

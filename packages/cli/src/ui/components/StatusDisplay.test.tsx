@@ -186,14 +186,15 @@ describe('StatusDisplay', () => {
     unmount();
   });
 
-  it('renders Sisyphus countdown timer when active', () => {
+  it('renders Sisyphus countdown timer when active', async () => {
     const uiState = createMockUIState({
       sisyphusSecondsRemaining: 65, // 01:05
     });
-    const { lastFrame } = renderStatusDisplay(
+    const { lastFrame, unmount } = await renderStatusDisplay(
       { hideContextSummary: false },
       uiState,
     );
     expect(lastFrame()).toContain('✦ Resuming work in 01:05');
+    unmount();
   });
 });
