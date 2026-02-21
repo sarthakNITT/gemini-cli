@@ -374,7 +374,7 @@ export class Storage {
   }
 
   getConfuciusModeStatePath(): string {
-    return path.join(this.getProjectTempDir(), 'confucius_state.json');
+    return path.join(this.getGeminiDir(), 'confucius_state.json');
   }
 
   getKnowledgeDir(): string {
