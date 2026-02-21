@@ -279,10 +279,13 @@ export const useGeminiStream = (
 
       try {
         const content = await fs.readFile(statePath, 'utf8');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const state = JSON.parse(content);
-        if (state.lastConfuciusModeTime) {
+
+        if (state && typeof state.lastConfuciusModeTime === 'number') {
           // If the recorded time is already overdue, reset to 'now' to avoid startup interruption.
           // Otherwise, respect the persistent timestamp.
+
           if (now - state.lastConfuciusModeTime >= intervalMs) {
             setLastConfuciusModeTime(now);
           } else {

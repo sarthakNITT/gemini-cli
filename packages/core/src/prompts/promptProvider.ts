@@ -290,8 +290,9 @@ export class PromptProvider {
   getArchiveIndexPrompt(config: Config): string {
     const desiredModel = resolveModel(config.getActiveModel());
     const isModernModel = supportsModernFeatures(desiredModel);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any
     const activeSnippets = (isModernModel ? snippets : legacySnippets) as any;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return activeSnippets.getArchiveIndexPrompt();
   }
 
