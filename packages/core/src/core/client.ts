@@ -951,6 +951,7 @@ Do not wait for a reflection cycle if the information is critical for future tur
       }
     } finally {
       const hookState = this.hookStateMap.get(prompt_id);
+      let isOutermost = false;
       if (hookState) {
         hookState.activeCalls--;
         const isPendingTools =
@@ -958,29 +959,40 @@ Do not wait for a reflection cycle if the information is critical for future tur
         const isAborted = signal?.aborted;
 
         if (hookState.activeCalls <= 0) {
+          isOutermost = true;
           if (!isPendingTools || isAborted) {
             this.hookStateMap.delete(prompt_id);
           }
         }
       }
-    }
 
-    const isPendingTools =
-      turn?.pendingToolCalls && turn.pendingToolCalls.length > 0;
-    const isOnlySchedulingWork =
-      isPendingTools &&
-      turn.pendingToolCalls?.every(
-        (call) => call.name === SCHEDULE_WORK_TOOL_NAME,
-      );
+      const isPendingTools =
+        turn?.pendingToolCalls && turn.pendingToolCalls.length > 0;
+      const isOnlySchedulingWork =
+        isPendingTools &&
+        turn?.pendingToolCalls?.every(
+          (call) => call.name === SCHEDULE_WORK_TOOL_NAME,
+        );
 
-    if ((!isPendingTools || isOnlySchedulingWork) && !signal?.aborted) {
-      const startIndex =
-        this.promptStartIndexMap.get(prompt_id) ?? historyBeforeLength;
-      const recentTurnContents = this.getChat().getHistory().slice(startIndex);
-      this.memoryConsolidationService.triggerMicroConsolidation(
-        recentTurnContents,
-      );
-      this.promptStartIndexMap.delete(prompt_id);
+      // Trigger consolidation at Event Boundaries:
+      // - The macro-turn has finished (isOutermost)
+      // - AND (no pending tools OR it intentionally paused via schedule_work OR an error/abort occurred causing a premature exit)
+      if (
+        isOutermost &&
+        (!isPendingTools || isOnlySchedulingWork || signal?.aborted || !turn)
+      ) {
+        if (this.promptStartIndexMap.has(prompt_id)) {
+          const startIndex =
+            this.promptStartIndexMap.get(prompt_id) ?? historyBeforeLength;
+          const recentTurnContents = this.getChat()
+            .getHistory()
+            .slice(startIndex);
+          this.memoryConsolidationService.triggerMicroConsolidation(
+            recentTurnContents,
+          );
+          this.promptStartIndexMap.delete(prompt_id);
+        }
+      }
     }
 
     return turn;

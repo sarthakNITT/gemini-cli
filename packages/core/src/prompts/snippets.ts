@@ -815,31 +815,29 @@ The structure MUST be as follows:
 export const CONFUCIUS_PROMPT = `
 # Task: Self-Reflection & Knowledge Solidification (Confucius Mode)
 
-As an autonomous agent, your goal is to evolve your long-term memory into an efficient, automated codebase while maintaining strict clarity about your proven capabilities versus your limitations.
+As an autonomous agent, your goal is to evolve your long-term memory into an efficient, automated codebase. To do this, you must ruthlessly separate signal from noise.
 
 ## 吾日三省吾身 (I reflect on myself three times a day)
 1. **Review Mission & Objectives:** Read \`GEMINI.md\` to ground yourself in the current high-level goals.
-2. **Analyze Recent Activity:** Review the conversation history since the last reflection. **CRITICAL:** You MUST also read \`.gemini/knowledge/hippocampus.md\` (if it exists) to review the short-term factual takeaways and errors accumulated recently.
-3. **Knowledge Retrieval:** Ensure you have read the current contents of \`.gemini/knowledge/\` before making changes.
+2. **Analyze Recent Activity:** Read \`.gemini/knowledge/hippocampus.md\` to review the thematic short-term takeaways.
+3. **Knowledge Retrieval:** Read the current contents of \`.gemini/knowledge/\` before making changes.
 4. **Environment Cleanup (Aggressive):** Identify temporary files (e.g., \`test_debug.txt\`, \`temp_script.sh\`), experimental drafts, or non-deterministic artifacts created during your work. **DELETE THEM.** Do not leave clutter. If an existing script in \`.gemini/knowledge/\` is no longer useful or reliable, delete it. A lean workspace is a productive workspace.
 
-## 知之为知之，不知为不知，是知也 (To know what you know and what you do not know, that is true knowledge)
-1. **Knowledge Solidification (知之为知之):** 
-   - **Core Context:** Identify the most critical, high-level project facts, rules, or architectural decisions and explicitly add them to \`GEMINI.md\`. **CRITICAL:** Keep this file extremely concise. Every word consumes context tokens; ruthlessly edit for brevity and remove stale or overly verbose details. Preserve existing frontmatter.
-   - **Deterministic:** Identify knowledge (e.g., specific environment setup, build commands, test patterns) that you have conclusively proven to work repeatably.
-   - **Automated:** Solidify this verified knowledge by writing reusable scripts (shell, python, etc.) into \`.gemini/knowledge/\`. Prefer scripts over plain documentation where possible.
-   - **Indexed:** Every script must be documented in \`.gemini/knowledge/README.md\` to index and accurately describe its purpose.
-2. **Acknowledge Limitations (不知为不知):**
-   - **Honest:** Explicitly document known anti-patterns, flaky approaches, or persistent failures in \`.gemini/knowledge/README.md\` or \`GEMINI.md\` to avoid wasting time in the future. Clearly state the limitations and assumptions of every stored script.
-   - Do not store speculative or non-deterministic scripts as verified knowledge. If a script is flaky, it must be deleted or heavily caveated.
-   - **Self-Correction (Concise & Consistent):** If you identify persistent failures, do not just delete the failed code. Write a "Lesson Learned" entry in \`.gemini/knowledge/lessons.md\`.
-     - **Format:** Keep it ultra-brief. Use the format: "**[Topic]** I used to try X, but it fails because Y. Instead, I must always do Z."
-     - **Cross-Reference:** Before adding a new lesson, check if a similar one exists. If so, refine or update the existing entry rather than appending a duplicate or contradictory one. Keep the knowledge base consistent.
+## 主动遗忘与降权 (Active Inhibition & Directed Forgetting) - CRITICAL
+Before saving new knowledge, you MUST prune the dead branches.
+1. **Identify Dead Ends:** Locate any abandoned goals, failed architectural hypotheses, or deprecated plans currently written in \`GEMINI.md\` or \`.gemini/knowledge/README.md\`.
+2. **Ruthless Deletion:** Use the \`replace\` or \`write_file\` tool to **DELETE** these obsolete details from \`GEMINI.md\` and other knowledge files. Do not keep historical baggage in your active working memory. 
+3. **Demotion:** If a failed path taught you a valuable lesson, do not keep the failed code. Move the abstract lesson to \`.gemini/knowledge/lessons.md\` and erase the specific details from your main context.
+
+## 知之为知之，不知为不知，是知也 (To know what you know and what you do not know...)
+1. **Thematic Solidification:** Look at the **[Theme: ...]** tags in the hippocampus. Group your learnings by these themes.
+2. **Core Context Update:** Explicitly add only the *currently surviving, proven* high-level project facts to \`GEMINI.md\`. **CRITICAL:** Keep this file extremely concise. Every word consumes context tokens; ruthlessly edit for brevity and remove stale or overly verbose details. Preserve existing frontmatter.
+3. **Automated & Indexed:** Solidify verified knowledge into reusable scripts in \`.gemini/knowledge/\`, and index them in its \`README.md\`.
 
 ## Flush the Hippocampus (CRITICAL)
-- Once you have absorbed the knowledge from \`.gemini/knowledge/hippocampus.md\`, you MUST clear its contents using a tool call (e.g., \`echo "" > .gemini/knowledge/hippocampus.md\`). If you don't, your short-term memory will overflow.
+- You MUST clear the contents of \`.gemini/knowledge/hippocampus.md\` (e.g., \`echo "" > .gemini/knowledge/hippocampus.md\`). If you don't, your short-term memory will overflow.
 
-3. **Status Report:** After completing your reflection and cleanup, output a concise 2-3 sentence summary addressed to the user detailing what you learned, what you automated, and confirm that the hippocampus was flushed.
+3. **Status Report:** After completing your reflection and cleanup, output a concise 2-3 sentence summary addressed to the user detailing what themes you advanced, what dead-ends you deleted (Active Inhibition), and confirm that the hippocampus was flushed.
 
 Your reflection should be thorough, honest, and efficient. Once complete, you will return control to the user (or resume your mission if in Sisyphus mode).
 `.trim();

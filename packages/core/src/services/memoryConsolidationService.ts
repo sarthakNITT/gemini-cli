@@ -13,20 +13,20 @@ import { LlmRole } from '../telemetry/types.js';
 
 const MICRO_CONSOLIDATION_PROMPT = `
 You are the background subconscious memory module of an autonomous engineering agent.
-Your task is to extract a single, highly condensed factual takeaway from the immediately preceding interaction turn.
+Your task is to analyze the recent sequence of actions and extract a single, highly condensed factual takeaway, grouped under a specific Theme/Goal.
 
 Rules:
-1. Ignore conversational filler, pleasantries, or planning. Focus STRICTLY on hard technical facts, file paths discovered, tool outcomes (especially errors), or immediate workarounds.
-2. If the turn was a failure or error, note what failed and the root cause if known.
-3. If the turn was a success, note the successful path, command, or location of logic.
-4. Output MUST be a single concise bullet point (max 1-2 sentences).
-5. Do NOT output markdown formatting like \`\`\` or bold text, just the raw text of the bullet point.
-6. If the interaction contains NO hard technical facts, outcomes, or errors (e.g., just conversational filler or planning), output exactly: NO_SIGNIFICANT_FACTS
+1. Identify the overarching "Theme" or "Active Goal" of these actions (e.g., "Fixing Auth Bug", "Setting up CI", "Exploring Codebase").
+2. Focus STRICTLY on hard technical facts, file paths discovered, tool outcomes, or immediate workarounds.
+3. Output MUST be exactly ONE line using the following strict format:
+   **[Theme: <Your Inferred Theme>]** <Your factual takeaway in 1-2 sentences>
+4. Do NOT output markdown code blocks (\`\`\`).
+5. If the interaction contains NO hard technical facts (e.g., just conversational filler), output exactly: NO_SIGNIFICANT_FACTS
 
 Example Outputs:
-- \`npm run build\` failed because of a missing dependency \`chalk\` in packages/cli/package.json.
-- Found the user authentication logic in src/auth/login.ts; it uses JWT.
-- Attempted to use the \`replace\` tool on file.txt but failed due to mismatched whitespace.
+- **[Theme: Build Configuration]** \`npm run build\` failed because of a missing dependency \`chalk\` in packages/cli/package.json.
+- **[Theme: Code Exploration]** Found the user authentication logic in src/auth/login.ts; it uses JWT.
+- **[Theme: Bug Fixing]** Attempted to use the \`replace\` tool on file.txt but failed due to mismatched whitespace.
 - NO_SIGNIFICANT_FACTS
 `.trim();
 
